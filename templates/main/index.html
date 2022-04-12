@@ -1,0 +1,54 @@
+{% extends 'main/base.html'%}
+{% load static %}
+{% block page_content %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="{% static "/css/home.css" %}">
+ <body>
+
+<div class="container-fluid">
+    <div class="row">
+     {% for object in object_list %}
+        <div class="col-lg-4">
+                <div class="articleImage">
+            {% if object.image %}
+                <img src="{{ object.image }}"  sizes="(min-width: 1440px) 335px, (min-width: 1280px) 22.5vw, (min-width: 960px) 30vw, (min-width: 600px) 47.5vw, 95vw" alt="" width="1280" height="720" >
+            {% else %}
+                <img src="{% static "images/economist_logo.png" %}"  sizes="(min-width: 1440px) 335px, (min-width: 1280px) 22.5vw, (min-width: 960px) 30vw, (min-width: 600px) 47.5vw, 95vw" alt="" width="1280" height="720">
+            {% endif %}
+            </div>
+                <div class="card-body">
+            <h5 class="card-title">
+                <div class="card-body">
+                    <h4>Date published: {{ object.date_published }}</h4>
+                    <a href="http://localhost:8000/article/{{ object.pk }}"><h4 class="card-title">{{object.title}}</h4></a>
+                </div>
+            </h5>
+                </div>
+        </div>
+    {% endfor %}
+
+    </div>
+</div>
+
+
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+</body>
+{% endblock %}

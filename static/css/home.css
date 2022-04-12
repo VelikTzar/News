@@ -1,0 +1,13 @@
+ /* Create two equal columns that floats next to each other */
+
+
+
+.articleImage {
+  width: auto;
+  display: inline-block;
+}
+
+.articleImage img {
+  width: 50%; /* Will shrink image to 30% of its original width */
+  height: auto;
+}

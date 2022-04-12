@@ -1,0 +1,41 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block page_content %}
+    <section id="detailsPage">
+    <div class="wrapper">
+
+        <div class="articleImage">
+            {% if article.image %}
+                <img src="{{ article.image }}"  style="width: 55vw; min-width: 330px;">
+            {% else %}
+                <img src="{% static "images/economist_logo.png" %}">
+            {% endif %}
+        </div>
+
+        <div class="articleInfo">
+
+            <div class="articleText">
+                <h1>Title: {{ article.title }}</h1>
+                <h4>Date published: {{ article.date_published }}</h4>
+                <a href="{{ article.url }}"><h3>View original</h3></a>
+                <h4>Source: {{article.news_site}}</h4>
+                <h4>Text: {{article.content}}</h4>
+            </div>
+
+            <div class="actionBtn">
+                <a href="{% url "index" %}">Back</a>
+                <h4>Likes: {{ article.get_likes_dislikes_sum }}</h4>
+                    <a href="http://localhost:8000/article/like/{{ object.pk }}">
+                    Like
+                    </a>
+                    <a href="http://localhost:8000/article/dislike/{{ object.pk }}">
+                    Dislike
+                    </a>
+                <a href="http://localhost:8000/article/save/{{ object.pk }}">Save article</a>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}

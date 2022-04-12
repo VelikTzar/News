@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Logout</title>
+</head>
+<body>
+    <form action="{% url 'logout' %}" method="POST">
+        {% csrf_token %}
+        {{ form }}
+        <button>Logout</button>
+    </form>
+</body>
+</html>

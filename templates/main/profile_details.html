@@ -1,0 +1,41 @@
+{% extends "main/base.html" %}
+{% load static %}
+{% block page_content %}
+    <section id="detailsPage">
+    <div class="wrapper">
+
+
+
+        <div class="profileInfo">
+
+            <div class="profileText">
+                <h1>Email: {{ profile.email }}</h1>
+                {% if profile.first_name %}
+                    <h4>First name: {{ profile.first_name }}</h4>
+                {% endif %}
+                {% if profile.last_name %}
+                    <h4>Last name: {{ profile.last_name }}</h4>
+                {% endif %}
+                {% if profile.date_of_birth %}
+                    <h4>Date of birth: {{profile.date_of_birth}}</h4>
+                {% endif %}
+            </div>
+
+            <div class="profileImage">
+                {% if profile.image %}
+                 <img src="{{ profile.image }}"  style="width: 55vw; min-width: 330px;">
+                {% else %}
+                  <img src="{% static "images/default_user.png" %}"  style="width: 55vw; min-width: 330px;">
+                {% endif %}
+            </div>
+
+            <div class="actionBtn">
+                <a href="http://localhost:8000/profile/edit/{{ profile.pk }}">Edit profile</a>
+                <a href="{% url "index" %}">Back</a>
+                <a href="{% url "saved articles" %}">Saved articles</a>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
