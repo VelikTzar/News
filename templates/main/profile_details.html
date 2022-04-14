@@ -1,12 +1,12 @@
-{% extends "main/base.html" %}
+{% extends "main/base_templates/base.html" %}
 {% load static %}
 {% block page_content %}
     <section id="detailsPage">
     <div class="wrapper">
 
 
-
-        <div class="profileInfo">
+        <div class="container-fluid">
+            <div class="text-black">
 
             <div class="profileText">
                 <h1>Email: {{ profile.email }}</h1>
@@ -21,20 +21,43 @@
                 {% endif %}
             </div>
 
-            <div class="profileImage">
+            <div class="container">
                 {% if profile.image %}
-                 <img src="{{ profile.image }}"  style="width: 55vw; min-width: 330px;">
+                 <img class="img-thumbnail" src="{{ profile.image }}" >
                 {% else %}
-                  <img src="{% static "images/default_user.png" %}"  style="width: 55vw; min-width: 330px;">
+                  <img class="img-thumbnail" src="{% static "images/default_user.png" %}">
                 {% endif %}
             </div>
 
-            <div class="actionBtn">
-                <a href="http://localhost:8000/profile/edit/{{ profile.pk }}">Edit profile</a>
-                <a href="{% url "index" %}">Back</a>
-                <a href="{% url "saved articles" %}">Saved articles</a>
-            </div>
+          <div class="btn-group-justified">
+            <div class="container-fluid" style="font-size:3vw;">
 
+                <div class="row-cols-md-4">
+                     <div class="col-md-4">
+                         <a href="{% url "index" %}">
+                             <h3>Back</h3>
+                         </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="http://localhost:8000/profile/edit/{{ profile.pk }}">
+                            <h3>Edit Profile</h3>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="http://localhost:8000/profile/delete/{{ profile.pk }}">
+                            <h3>Delete profile</h3>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="{% url "saved articles" %}">
+                            <h3>Saved articles</h3>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+          </div>
+        </div>
         </div>
     </div>
 </section>

@@ -1,7 +1,13 @@
 import scrapy
+from scrapy.exceptions import DontCloseSpider
 from scrapy.spiders import XMLFeedSpider
 from ..items import ArticleItem, NewsSiteItem
 from News.main.models import NewsSite
+import scrapy
+import logging
+import time
+from scrapy import signals, Request
+from w3lib.html import remove_tags
 
 class NewsSiteSpider(scrapy.Spider):
     name = ""
@@ -41,18 +47,17 @@ class TheEconomistQ2(XMLFeedSpider):
         if title == "":
             title = "".join(response.css('.css-1bo5zl0::text').getall())
 
-        content = "".join(response.css('.article__body-text--dropcap > span:nth-child(1)::text').getall())
-        content += "".join(response.css('.article__body-text--dropcap > small:nth-child(2)::text').getall())
-        content += "".join(response.css('.article__body-text--dropcap::text').getall())
-        content += "".join(response.css('p.article__body-text::text').getall())
+        with_tags = "".join(response.css('p.article__body-text').getall())
+        clean_text = remove_tags(with_tags)
+        content = clean_text
         url = response.url
-        date_modified = "".join(response.css(".article > meta:nth-child(6)::attr(content)").getall(),)
-        date_published = "".join(response.css(".article > meta:nth-child(7)::attr(content)").getall(),)
+        date_modified = "".join(response.css(".article > meta:nth-child(6)::attr(content)").getall(), )
+        date_published = "".join(response.css(".article > meta:nth-child(7)::attr(content)").getall(), )
         id = int(1)
         image = response.css(".article__lead-image > div:nth-child(1) > meta:nth-child(1)::attr(content)").get()
-        item = ArticleItem(title=title, content=content, url=url, date_modified=date_modified, date_published=date_published, id=id, image_src=image)
+        item = ArticleItem(title=title, content=content, url=url, date_modified=date_modified,
+                           date_published=date_published, id=id, image_src=image)
         yield item
-
 
 
 # class DeutscheWelle(XMLFeedSpider):

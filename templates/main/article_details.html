@@ -1,4 +1,4 @@
-{% extends "main/base.html" %}
+{% extends "main/base_templates/base.html" %}
 {% load static %}
 {% block page_content %}
     <section id="detailsPage">
@@ -6,33 +6,53 @@
 
         <div class="articleImage">
             {% if article.image %}
-                <img src="{{ article.image }}"  style="width: 55vw; min-width: 330px;">
+                <img class="img-responsive" src="{{ article.image }}"  style="width: 55vw; min-width: 330px;">
             {% else %}
-                <img src="{% static "images/economist_logo.png" %}">
+                <img class="img-responsive" src="{% static "images/economist_logo.png" %}">
             {% endif %}
         </div>
 
-        <div class="articleInfo">
+        <div class="text-justify">
 
-            <div class="articleText">
-                <h1>Title: {{ article.title }}</h1>
+            <div class="articleText" style="font-size:5vw;">
+                <h1 class="modal-title">Title: {{ article.title }}</h1>
                 <h4>Date published: {{ article.date_published }}</h4>
-                <a href="{{ article.url }}"><h3>View original</h3></a>
-                <h4>Source: {{article.news_site}}</h4>
-                <h4>Text: {{article.content}}</h4>
+                <div class="btn-group-justified">
+                        <div class="container-fluid">
+                                <a class="btn-link" href="http://localhost:8000/article/full/{{ article.pk }}">
+                                    <h3>View full text</h3>
+                                </a>
+                                <a class="btn-link" href="{{ article.url }}">
+                                    <h3>View original</h3>
+                                </a>
+                        </div>
+                </div>
+
+                <h3> Source: <strong>{{article.news_site}}</strong></h3>
+                <h4 class="text-body"><strong>AI-generated summary:</strong> {{article.get_summary}}</h4>
             </div>
 
-            <div class="actionBtn">
-                <a href="{% url "index" %}">Back</a>
+            <div class="container-fluid" style="font-size:3vw;">
+                <a href="{% url "index" %}"><h3>Back</h3></a>
                 <h4>Likes: {{ article.get_likes_dislikes_sum }}</h4>
-                    <a href="http://localhost:8000/article/like/{{ object.pk }}">
-                    Like
-                    </a>
-                    <a href="http://localhost:8000/article/dislike/{{ object.pk }}">
-                    Dislike
-                    </a>
-                <a href="http://localhost:8000/article/save/{{ object.pk }}">Save article</a>
+                <div class="row-cols-md-4">
 
+                    <div class="col-md-4">
+                        <a href="http://localhost:8000/article/like/{{ object.pk }}">
+                            <h3>Like</h3>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="http://localhost:8000/article/dislike/{{ object.pk }}">
+                            <h3>Dislike</h3>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="http://localhost:8000/article/save/{{ object.pk }}">
+                            <h3>Save article</h3>
+                        </a>
+                    </div>
+                </div>
             </div>
 
         </div>

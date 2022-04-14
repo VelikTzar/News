@@ -5,6 +5,7 @@ from .managers import NewsUserManager
 # Create your models here.
 
 
+
 class NewsUser(auth_user.AbstractBaseUser, auth_models.PermissionsMixin):
     email = models.EmailField(
         verbose_name='email address',
@@ -21,3 +22,4 @@ class NewsUser(auth_user.AbstractBaseUser, auth_models.PermissionsMixin):
     REQUIRED_FIELDS = []
 
     object = NewsUserManager()
+

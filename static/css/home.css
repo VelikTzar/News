@@ -5,9 +5,11 @@
 .articleImage {
   width: auto;
   display: inline-block;
+  justify-content: center;
 }
 
 .articleImage img {
   width: 50%; /* Will shrink image to 30% of its original width */
   height: auto;
+  justify-content: center;
 }

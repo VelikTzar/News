@@ -1,12 +1,15 @@
-from scrapy.crawler import CrawlerProcess
-from scrapy.utils.project import get_project_settings
+from scrapy.crawler import CrawlerRunner
+from scrapy.utils.log import configure_logging
+from twisted.internet import reactor
+from twisted.internet.task import LoopingCall
 from scraper.scraper.spiders.spiders import TheEconomistQ2
 
 
 def run_spider():
-    def handle(self, *args, **kwargs):
-        process = CrawlerProcess(get_project_settings())
+    configure_logging()
+    runner = CrawlerRunner()
+    task = LoopingCall(lambda: runner.crawl(TheEconomistQ2))
+    task.start(60*30)
+    reactor.run()
 
-        process.crawl(TheEconomistQ2)
-        process.start()
 

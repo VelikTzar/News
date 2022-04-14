@@ -1,6 +1,8 @@
 from django.db import models
+
 # Create your models here.
 from News.accounts.models import NewsUser
+from News.main.summarizer import summarize
 
 
 class Profile(models.Model):
@@ -56,7 +58,6 @@ class NewsSite(models.Model):
         blank=True,
     )
 
-
     def __str__(self):
         return self.name
 
@@ -100,6 +101,10 @@ class Article(models.Model):
         Profile, related_name='disliked', blank=True,
     )
 
+    summary = models.TextField(
+        null=True, blank=True,
+    )
+
     def get_likes(self):
         return self.liked_by.count()
 
@@ -109,7 +114,18 @@ class Article(models.Model):
     def get_likes_dislikes_sum(self):
         return int(self.get_likes()) - int(self.get_dislikes())
 
+    def get_summary(self):
+        if self.summary:
+            return self.summary
+        else:
+            summary = summarize(self.content)
+            self.summary = summary
+            return summary
+
     def __str__(self):
         return self.title
 
-
+    def save(self, *args, **kwargs):
+        if not self.summary:
+            self.summary = summarize(self.content)
+        return super().save(*args, **kwargs)

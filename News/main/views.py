@@ -1,18 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.management import call_command
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import ListView, DetailView, FormView, UpdateView
-
-from .forms import ProfileForm
-from .management.startscrapy import scrape
-
+from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView, TemplateView
 from .models import Article, Profile
-
+from .runspider import scrape
 
 # connect scrapyd service
 
@@ -24,10 +19,12 @@ from .models import Article, Profile
 #   call_scrapy_spider()
 #  print("kill me")
 # return redirect('index')
+from ..accounts.models import NewsUser
+
 
 class HomeView(LoginRequiredMixin, ListView):
     model = Article
-    paginate_by = 12
+    paginate_by = 40
     queryset = Article.objects.order_by('-date_published')
     template_name = "main/index.html"
     login_url = reverse_lazy("login")
@@ -40,6 +37,18 @@ class HomeView(LoginRequiredMixin, ListView):
 class ArticleDetailView(LoginRequiredMixin, DetailView):
     model = Article
     template_name = "main/article_details.html"
+    login_url = reverse_lazy("login")
+
+    def get_context_data(self, **kwargs):
+        profile_id = self.request.user.pk
+        context = super().get_context_data(**kwargs)
+        context["profile"] = Profile.objects.get(pk=profile_id)
+        return context
+
+
+class ArticleFullTextView(LoginRequiredMixin, DetailView):
+    model = Article
+    template_name = "main/article_full_text.html"
     login_url = reverse_lazy("login")
 
     def get_context_data(self, **kwargs):
@@ -116,16 +125,38 @@ class SavedArticlesView(ListView):
 
 
 class ProfileEditView(UpdateView):
-    form = ProfileForm()
     model = Profile
-    fields = ['first_name', 'last_name', 'date_of_birth', 'image']
+    fields = ['first_name', 'last_name', 'date_of_birth', 'profile_image']
     template_name = "main/profile_edit.html"
+    success_url = reverse_lazy("profile")
 
 
+class ProfileDeleteView(DeleteView):
+    model = NewsUser
+    success_url = reverse_lazy('home no login')
+    template_name = "main/profile_delete.html"
 
 
+class ArticleCreateView(CreateView):
+    model = Article
 
 
+class ArticleEditView(UpdateView):
+    model = Article
+
+
+class ArticleDeleteView(DeleteView):
+    model = Article
+
+
+class HomeNoLoginView(TemplateView):
+    template_name = "main/home_no_login.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        last_article = Article.objects.latest("date_published")
+        context["object"] = last_article
+        return context
 
 
 @login_required
@@ -137,7 +168,8 @@ def ProfileDetailView(request):
     }
     return render(request=request, context=context, template_name="main/profile_details.html")
 
+
 @login_required
 def scrape_view(request):
-    #scrape()
+    scrape()
     return redirect('index')

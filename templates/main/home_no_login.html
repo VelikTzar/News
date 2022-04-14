@@ -1,24 +1,46 @@
-{% extends 'main/base_templates/base.html' %}
+<!DOCTYPE html>
+<html lang="en">
 {% load static %}
-{% block page_content %}
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NewsApp</title>
+    <!-- Static Load -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="{% static "/css/home.css" %}">
- <body>
+</head>
 
+<header>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <div class="navbar-header" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link active" href="{% url 'home no login' %}"><span class="h3">Home</span></a>
+                <a class="nav-item nav-link" href="{% url 'register' %}"><span class="h3">Register</span></a>
+                <a class="nav-item nav-link" href="{% url 'login' %}"><span class="h3">Login</span></a>
+            </div>
+        </div>
+    </nav>
+
+</header>
+
+
+<body>
+</div>
 <div class="container-fluid">
-    <div class="row-cols-auto">
-     {% for object in object_list %}
-        <div class="col-sm-3">
-            <div class="container-fluid">
+
+
+        <div class="container-fluid">
+            <div class="media-heading">
                 {% if object.image %}
                     <img class="img-responsive" src="{{ object.image }}"  sizes="(min-width: 1440px) 335px, (min-width: 1280px) 22.5vw, (min-width: 960px) 30vw, (min-width: 600px) 47.5vw, 95vw" alt="" width="1280" height="720" >
                 {% else %}
                     <img src="{% static "images/economist_logo.png" %}"  sizes="(min-width: 1440px) 335px, (min-width: 1280px) 22.5vw, (min-width: 960px) 30vw, (min-width: 600px) 47.5vw, 95vw" alt="" width="1280" height="720">
                 {% endif %}
             </div>
-            <div class="container-fluid">
+            <div class="media-body">
 
                 <div class="card-body">
                     <h4>Date published: {{ object.date_published }}</h4>
@@ -27,28 +49,11 @@
 
             </div>
         </div>
-    {% endfor %}
 
-    </div>
+
 </div>
 
 
-<div class="pagination">
-    <span class="step-links">
-        {% if page_obj.has_previous %}
-            <a href="?page=1">&laquo; first</a>
-            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-        {% endif %}
 
-        <span class="current">
-            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-        </span>
-
-        {% if page_obj.has_next %}
-            <a href="?page={{ page_obj.next_page_number }}">next</a>
-            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-        {% endif %}
-    </span>
-</div>
 </body>
-{% endblock %}
+</html>
