@@ -72,8 +72,6 @@ class Article(models.Model):
         blank=True,
     )
     content = models.TextField(
-        null=True,
-        blank=True,
     )
     news_site = models.ForeignKey(
         NewsSite,

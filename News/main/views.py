@@ -155,7 +155,7 @@ class HomeNoLoginView(TemplateView):
             context["object"] = last_article
             return context
         except:
-            context["object"] = Article(title="Title")
+            context["object"] = Article(title="Title", content="Content")
             return context
 
 

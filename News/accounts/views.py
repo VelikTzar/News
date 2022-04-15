@@ -12,7 +12,7 @@ class NewsUserLoginView(auth_views.LoginView):
 
 class NewsUserLogoutView(auth_views.LogoutView):
     template_name = "accounts/logout.html"
-    next_page = reverse_lazy("login")
+    success_url = reverse_lazy("login")
 
 
 class NewsUserRegisterView(CreateView):

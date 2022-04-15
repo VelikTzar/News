@@ -9,6 +9,9 @@
 
 <div class="container-fluid">
     <div class="row-cols-auto">
+        {% if not object_list %}
+            <p>No articles available. </p>
+        {% endif %}
      {% for object in object_list %}
         <div class="col-sm-3">
             <div class="container-fluid">
