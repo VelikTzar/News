@@ -67,7 +67,10 @@ class NewsSite(models.Model):
 
 class Article(models.Model):
     title = models.CharField(max_length=255)
-    url = models.URLField()
+    url = models.URLField(
+        null=True,
+        blank=True,
+    )
     content = models.TextField(
         null=True,
         blank=True,
@@ -75,6 +78,8 @@ class Article(models.Model):
     news_site = models.ForeignKey(
         NewsSite,
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
 
     date_published = models.DateTimeField(
@@ -148,10 +153,10 @@ class Comment(models.Model):
         auto_now_add=True,
     )
     liked_by = models.ManyToManyField(
-        Profile, related_name='liked', blank=True,
+        Profile, related_name='likes', blank=True,
     )
     disliked_by = models.ManyToManyField(
-        Profile, related_name='disliked', blank=True,
+        Profile, related_name='dislikes', blank=True,
     )
 
     def get_likes(self):

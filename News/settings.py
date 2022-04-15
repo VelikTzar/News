@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'guardian',
+
     'News.main',
     'News.accounts',
 ]
@@ -55,6 +57,11 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'News.urls'
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend', # default
+    'guardian.backends.ObjectPermissionBackend',
+)
 
 TEMPLATES = [
     {

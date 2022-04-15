@@ -1,12 +1,18 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect, get_object_or_404
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView, DetailView, UpdateView, DeleteView, CreateView, TemplateView
-from .models import Article, Profile
+from guardian.decorators import permission_required_or_403
+from guardian.mixins import PermissionRequiredMixin
+from guardian.shortcuts import assign_perm
+
+from .forms import CommentForm, CommentEditForm, CommentDeleteForm
+from .models import Article, Profile, Comment
 from .runspider import scrape
 
 # connect scrapyd service
@@ -20,6 +26,7 @@ from .runspider import scrape
 #  print("kill me")
 # return redirect('index')
 from ..accounts.models import NewsUser
+
 
 
 class HomeView(LoginRequiredMixin, ListView):
@@ -58,8 +65,7 @@ class ArticleFullTextView(LoginRequiredMixin, DetailView):
         return context
 
 
-@method_decorator(login_required, name='dispatch')
-class ArticleLikeView(View):
+class ArticleLikeView(LoginRequiredMixin, View):
     def get_success_url(self):
         return f'http://localhost:8000/article/{self.kwargs.get("pk")}'
 
@@ -76,8 +82,7 @@ class ArticleLikeView(View):
         return redirect(self.get_success_url())
 
 
-@method_decorator(login_required, name='dispatch')
-class ArticleDislikeView(View):
+class ArticleDislikeView(LoginRequiredMixin, View):
     def get_success_url(self):
         return f'http://localhost:8000/article/{self.kwargs.get("pk")}'
 
@@ -94,8 +99,7 @@ class ArticleDislikeView(View):
         return redirect(self.get_success_url())
 
 
-@method_decorator(login_required, name='dispatch')
-class ArticleSaveView(View):
+class ArticleSaveView(LoginRequiredMixin, View):
     def get_success_url(self):
         return f'http://localhost:8000/article/{self.kwargs.get("pk")}'
 
@@ -110,8 +114,7 @@ class ArticleSaveView(View):
         return redirect(self.get_success_url())
 
 
-@method_decorator(login_required, name='dispatch')
-class SavedArticlesView(ListView):
+class SavedArticlesView(LoginRequiredMixin, ListView):
     model = Article
     paginate_by = 25
     template_name = "main/saved_articles.html"
@@ -124,29 +127,22 @@ class SavedArticlesView(ListView):
         return context
 
 
-class ProfileEditView(UpdateView):
+class ProfileEditView(PermissionRequiredMixin, UpdateView):
+    permission_required = 'main.change_profile'
+    raise_exception = True
     model = Profile
     fields = ['first_name', 'last_name', 'date_of_birth', 'profile_image']
     template_name = "main/profile_edit.html"
     success_url = reverse_lazy("profile")
 
 
-class ProfileDeleteView(DeleteView):
+
+class ProfileDeleteView(PermissionRequiredMixin, DeleteView):
+    permission_required = 'accounts.delete_newsuser'
+    raise_exception = True
     model = NewsUser
     success_url = reverse_lazy('home no login')
     template_name = "main/profile_delete.html"
-
-
-class ArticleCreateView(CreateView):
-    model = Article
-
-
-class ArticleEditView(UpdateView):
-    model = Article
-
-
-class ArticleDeleteView(DeleteView):
-    model = Article
 
 
 class HomeNoLoginView(TemplateView):
@@ -154,9 +150,123 @@ class HomeNoLoginView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        last_article = Article.objects.latest("date_published")
-        context["object"] = last_article
-        return context
+        try:
+            last_article = Article.objects.latest("date_published")
+            context["object"] = last_article
+            return context
+        except:
+            context["object"] = Article(title="Title")
+            return context
+
+
+
+class SubmitCommentView(LoginRequiredMixin, CreateView):
+    form_class = CommentForm
+    template_name = "main/comment.html"
+
+    def get_success_url(self):
+        pk = self.kwargs.get("pk")
+        return f"http://localhost:8000/article/{pk}"
+
+    def form_valid(self, form):
+        profile_id = self.request.user.pk
+        profile = Profile.objects.get(pk=profile_id)
+        article = Article.objects.get(pk=self.kwargs.get("pk"))
+        user = self.request.user
+        form.instance.user = profile
+        form.instance.article = article
+        super(SubmitCommentView, self).form_valid(form)
+        comment = form.instance
+        assign_perm('change_comment', user, comment)
+        assign_perm('delete_comment', user, comment)
+        assign_perm('view_comment', user, comment)
+        return redirect(self.get_success_url())
+
+
+class CommentLikeView(LoginRequiredMixin, View):
+    def get_success_url(self):
+        comment = Comment.objects.get(pk=self.kwargs.get("pk"))
+        pk = comment.article_id
+        return f'http://localhost:8000/article/{pk}'
+
+    def get(self, request, *args, **kwargs):
+        comment = Comment.objects.get(pk=self.kwargs.get("pk"))
+        profile_id = self.request.user.pk
+        profile = Profile.objects.get(pk=profile_id)
+        if profile in comment.liked_by.all():
+            comment.liked_by.remove(profile)
+        else:
+            if profile in comment.disliked_by.all():
+                comment.disliked_by.remove(profile)
+            comment.liked_by.add(profile)
+        return redirect(self.get_success_url())
+
+
+class CommentDislikeView(LoginRequiredMixin, View):
+    def get_success_url(self):
+        comment = Comment.objects.get(pk=self.kwargs.get("pk"))
+        pk = comment.article_id
+        return f'http://localhost:8000/article/{pk}'
+
+    def get(self, request, *args, **kwargs):
+        comment = Comment.objects.get(pk=self.kwargs.get("pk"))
+        profile_id = self.request.user.pk
+        profile = Profile.objects.get(pk=profile_id)
+        if profile in comment.disliked_by.all():
+            comment.disliked_by.remove(profile)
+        else:
+            if profile in comment.liked_by.all():
+                comment.liked_by.remove(profile)
+            comment.disliked_by.add(profile)
+        return redirect(self.get_success_url())
+
+
+@login_required
+def edit_comment_view(request, pk):
+    profile = Profile.objects.get(pk=request.user.pk)
+    user=request.user
+    comment = Comment.objects.get(pk=pk)
+    if not user.has_perm('main.delete_comment', comment):
+        raise PermissionDenied()
+    form = CommentEditForm(instance=comment)
+    if request.method == 'GET':
+        context = {
+            'profile': profile,
+            'form': form
+        }
+        return render(request, 'main/edit_comment.html', context)
+    else:
+        form = CommentEditForm(request.POST, instance=comment)
+        if form.is_valid():
+            album = form.save()
+            album.save()
+            pk = comment.article_id
+            return redirect(f"http://localhost:8000/article/{pk}")
+    context = {
+        'profile': profile,
+        'form': form,
+    }
+    return render(request, 'main/edit_comment.html', context)
+
+
+
+@login_required
+def delete_comment_view(request, pk):
+    profile = Profile.objects.get(pk=request.user.pk)
+    user=request.user
+    comment = Comment.objects.get(pk=pk)
+    if not user.has_perm('main.delete_comment', comment):
+        raise PermissionDenied()
+    form = CommentDeleteForm(instance=comment)
+    if request.method == 'GET':
+        context = {
+            'form': form,
+        }
+        return render(request, 'main/delete_comment.html', context)
+    else:
+        comment.delete()
+        pk = comment.article_id
+        return redirect(f"http://localhost:8000/article/{pk}")
 
 
 @login_required
@@ -169,8 +279,7 @@ def ProfileDetailView(request):
     return render(request=request, context=context, template_name="main/profile_details.html")
 
 
-@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def scrape_view(request):
     scrape()
     return redirect('index')
-

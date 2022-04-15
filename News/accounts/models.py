@@ -21,6 +21,7 @@ class NewsUser(auth_user.AbstractBaseUser, auth_models.PermissionsMixin):
     REQUIRED_FIELDS = []
 
     object = NewsUserManager()
+    objects = object
 
     def __str__(self):
         return self.email

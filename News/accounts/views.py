@@ -22,5 +22,7 @@ class NewsUserRegisterView(CreateView):
 
     def form_valid(self, form):
         result = super().form_valid(form)
-        login(self.request, self.object)
+        login(self.request, self.object, backend='django.contrib.auth.backends.ModelBackend')
         return result
+
+

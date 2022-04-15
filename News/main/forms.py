@@ -1,37 +1,30 @@
-from django.forms import forms
+import django.forms as forms
 from .models import *
 
 
 class CommentForm(forms.ModelForm):
+
     class Meta:
         model = Comment
-        fields = ('user', 'article', 'text')
+        fields = ('text', )
 
 
 class CommentEditForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ('user', 'article', 'text')
+        fields = ('text', )
         widgets = {
             'text': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Text', 'disabled': False, }),
-            'user': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'User', 'disabled': False, }),
-            'article': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Article', 'disabled': False, }),
         }
 
 
 class CommentDeleteForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ('text',)
 
         widgets = {
             'text': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Text', 'disabled': True,}),
-            'user': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'User', 'disabled': True,}),
-            'article': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Article', 'disabled': True,}),
         }
 
 
-
-
-class ArticleDeleteForm(forms.Form):
-    pass

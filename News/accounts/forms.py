@@ -1,6 +1,9 @@
 from django import forms as forms
+from django.contrib.auth.models import Group
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.core.exceptions import ValidationError
+from guardian.shortcuts import assign_perm
+
 from News.main.models import Profile
 
 from .models import NewsUser
@@ -27,9 +30,18 @@ class NewsUserCreationForm(forms.ModelForm):
         user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         profile = Profile(user=user, email=self.cleaned_data["email"])
+        my_group = Group.objects.get(name='Default user')
         if commit:
             user.save()
             profile.save()
+            my_group.user_set.add(user)
+            assign_perm('change_newsuser', user, user)
+            assign_perm('delete_newsuser', user, user)
+            assign_perm('view_newsuser', user, user)
+            assign_perm('change_profile', user, profile)
+            assign_perm('delete_profile', user, profile)
+            assign_perm('view_profile', user, profile)
+
         return user
 
 

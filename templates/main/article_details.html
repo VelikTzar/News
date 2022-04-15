@@ -54,7 +54,35 @@
                     </div>
                 </div>
             </div>
+            <div class="fa-comment">
+                <p class="media-heading">Comments</p>
+                <a href="http://localhost:8000/article/comment/{{ article.pk }}">Leave a comment</a>
+                {% for comment in article.comment_set.all %}
+                     <div class="comments" style="padding: 10px;">
 
+                        <p class="font-weight-bold">
+                            {{ comment.user.get_full_name }}
+                             <span class=" text-muted font-weight-normal">
+                                {{ comment.created_on }}
+                            </span>
+                        </p>
+                        <span class="h3">{{ comment.text}}</span>
+                        <div class="container-fluid">
+                            <h4>Likes: {{ comment.get_likes_dislikes_sum }}</h4>
+                            {% if comment.user_id == request.user.pk %}
+                                <div>
+                                <a href="http://localhost:8000/comment/edit/{{ comment.pk }}"> Edit comment</a>
+                                <a href="http://localhost:8000/comment/delete/{{ comment.pk }}"> Delete comment</a>
+                            </div>
+                            {% endif %}
+                            <div>
+                                <a href="http://localhost:8000/comment/like/{{ comment.pk }}">Like</a>
+                                <a href="http://localhost:8000/comment/dislike/{{ comment.pk }}">Dislike</a>
+                            </div>
+                        </div>
+                     </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
 </section>

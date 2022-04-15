@@ -7,7 +7,7 @@ from .models import *
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('text', 'user', 'article', 'created_on')
-    list_filter = ('created_on')
+    list_filter = ('created_on',)
     search_fields = ('name', 'email', 'body')
     actions = ['approve_comments']
 
