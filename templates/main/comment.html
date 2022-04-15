@@ -1,0 +1,10 @@
+{% extends "main/base_templates/base.html" %}
+{% block page_content %}
+<body>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form }}
+        <button>Comment</button>
+    </form>
+</body>
+{%endblock%}

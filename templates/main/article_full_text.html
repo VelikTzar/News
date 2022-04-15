@@ -1,0 +1,61 @@
+{% extends "main/base_templates/base.html" %}
+{% load static %}
+{% block page_content %}
+    <section id="detailsPage">
+    <div class="wrapper">
+
+        <div class="articleImage">
+            {% if article.image %}
+                <img class="img-responsive" src="{{ article.image }}"  style="width: 55vw; min-width: 330px;">
+            {% else %}
+                <img class="img-responsive" src="{% static "images/economist_logo.png" %}">
+            {% endif %}
+        </div>
+
+
+        <div class="articleInfo">
+
+            <div class="text-lg-center" style="font-size:8vw;" >
+                <h1 class="modal-title">{{ article.title }}</h1>
+                <h4>Date published: {{ article.date_published }}</h4>
+                <div class="btn-group-justified">
+                        <div class="container-fluid">
+                                <a class="btn-link" href="http://localhost:8000/article/{{ article.pk }}">
+                                    <h3>View AI-generated summary</h3>
+                                </a>
+                                <a class="btn-link" href="{{ article.url }}">
+                                    <h3>View original</h3>
+                                </a>
+                        </div>
+                </div>
+                <h3> Source: <strong>{{article.news_site}}</strong></h3>
+                <h4 class="text-body"><strong>Full text:</strong> {{article.content}}</h4>
+            </div>
+
+            <div class="container-fluid" style="font-size:3vw;">
+                <a href="{% url "index" %}"><h3>Back</h3></a>
+                <h4>Likes: {{ article.get_likes_dislikes_sum }}</h4>
+                <div class="row-cols-md-4">
+
+                    <div class="col-md-4">
+                        <a href="http://localhost:8000/article/like/{{ object.pk }}">
+                            <h3>Like</h3>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="http://localhost:8000/article/dislike/{{ object.pk }}">
+                            <h3>Dislike</h3>
+                        </a>
+                    </div>
+                    <div class="col-md-4">
+                        <a href="http://localhost:8000/article/save/{{ object.pk }}">
+                            <h3>Save article</h3>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+{% endblock %}
