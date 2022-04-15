@@ -173,3 +173,4 @@ def ProfileDetailView(request):
 def scrape_view(request):
     scrape()
     return redirect('index')
+

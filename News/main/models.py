@@ -45,6 +45,9 @@ class Profile(models.Model):
             return f'{self.first_name}'
         return self.email
 
+    def __str__(self):
+        self.get_full_name()
+
 
 class NewsSite(models.Model):
     name = models.CharField(max_length=255)
@@ -129,3 +132,39 @@ class Article(models.Model):
         if not self.summary:
             self.summary = summarize(self.content)
         return super().save(*args, **kwargs)
+
+
+class Comment(models.Model):
+    text = models.TextField()
+    user = models.ForeignKey(
+        to=Profile,
+        on_delete=models.CASCADE,
+    )
+    article = models.ForeignKey(
+        to=Article,
+        on_delete=models.CASCADE,
+    )
+    created_on = models.DateTimeField(
+        auto_now_add=True,
+    )
+    liked_by = models.ManyToManyField(
+        Profile, related_name='liked', blank=True,
+    )
+    disliked_by = models.ManyToManyField(
+        Profile, related_name='disliked', blank=True,
+    )
+
+    def get_likes(self):
+        return self.liked_by.count()
+
+    def get_dislikes(self):
+        return self.disliked_by.count()
+
+    def get_likes_dislikes_sum(self):
+        return int(self.get_likes()) - int(self.get_dislikes())
+
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        ordering = ['created_on']
