@@ -20,9 +20,9 @@ class ArticleAdmin(admin.ModelAdmin):
     list_display = ('title', 'url', 'content', 'news_site', 'date_published', 'date_modified', 'image', 'summary',)
     list_filter = ('date_published', 'title', 'news_site',)
     search_fields = ('title', 'url', 'news_site', 'summary',)
-    actions = ['approve_comments']
+    actions = ['approve_articles']
 
-    def approve_article(self, request, queryset):
+    def approve_articles(self, request, queryset):
         queryset.update(active=True)
 
 

@@ -4,7 +4,7 @@
 
     <section class="form-group">
 
-        <form class="form-control" method="post">
+        <form enctype="multipart/form-data" class="form-control" method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Update">
